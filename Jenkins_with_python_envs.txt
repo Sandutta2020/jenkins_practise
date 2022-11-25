@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+     stages {
+        stage('Build') {
+            steps {
+			withPythonEnv('python') {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+				bat "pip install -r requirement.txt"
+             } 
+            }
+        }
+		stage('Test') {
+            steps {
+			withPythonEnv('python') {
+                bat "python %WORKSPACE%\\basic.py"
+             }
+		    }
+        }
+		stage('Teardown') {
+            steps {
+                bat "rd /s /q %WORKSPACE%\\.pyenv-python"
+                
+            }
+        }
+    }
+}

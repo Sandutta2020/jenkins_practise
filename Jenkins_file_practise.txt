@@ -55,7 +55,6 @@ pipeline {
 			withPythonEnv('C:\\Users\\santa_000\\.jenkins\\workspace\\Python_login\\test_env\\Scripts') {
                 echo 'We are cloning the repository'
                 bat "echo %WORKSPACE%"
-                bat "python -m venv test_env"
                 bat "pip install -r requirement.txt"
                 bat "python %WORKSPACE%\\basic.py"
                 
@@ -66,39 +65,71 @@ pipeline {
 }
 
 
+pipeline {
+    agent any
+     stages {
+        stage('Build') {
+            steps {
+			withPythonEnv('python') {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+				bat "python -m venv test_env"
+                bat "pip install -r requirement.txt"
+                bat "python %WORKSPACE%\\basic.py"
+                
+            }
+			}
+        }
+    }
+}
 
 
 pipeline {
     agent any
-    environment {
-     PYTHONPATH = "%WORKSPACE%\\test_env\\Scripts"
-     }
      stages {
-        stage('Make Virtual Env') {
-            steps {
-                withPythonEnv('test_env') {
-                    bat 'pip install -r requirements.txt'
-                }
-            }
-        }
           stage('Test') {
             steps {
-                withPythonEnv('test_env') {
-                    bat 'python %WORKSPACE%\\basic.py'
+                withPythonEnv('python') {
+                    bat "python %WORKSPACE%\\basic.py"
                     }
                 }
             }
           stage('Teardown') {
             steps {
-			 withPythonEnv('test_env') {
-                bat "echo %WORKSPACE%"
-             } 
+                bat "rd /s /q %WORKSPACE%\\.pyenv-python"
             }
         }
     }
 }
 
 
+pipeline {
+    agent any
+     stages {
+        stage('Build') {
+            steps {
+			withPythonEnv('python') {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+				bat "pip install -r requirement.txt"
+             } 
+            }
+        }
+		stage('Test') {
+            steps {
+			withPythonEnv('python') {
+                bat "python %WORKSPACE%\\basic.py"
+             }
+		    }
+        }
+		stage('Teardown') {
+            steps {
+                bat "rd /s /q %WORKSPACE%\\.pyenv-python"
+                
+            }
+        }
+    }
+}
 
 
 
