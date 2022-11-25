@@ -1,0 +1,105 @@
+pipeline {
+    agent any
+
+     stages {
+        stage('Build') {
+            steps {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+                bat "python -m venv test_env"
+                bat "call %WORKSPACE%\\test_env\\Scripts\\activate.bat"
+                bat "pip install -r requirement.txt"
+                bat "python %WORKSPACE%\\basic.py"
+                
+            }
+        }
+    }
+}
+
+
+pipeline {
+    agent any
+
+     stages {
+        stage('Build') {
+            steps {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+				bat "conda activate pytest_env"
+                
+            }
+        }
+		stage('Test') {
+            steps {
+                bat "python %WORKSPACE%\\basic.py"
+            }
+        }
+		stage('Teardown') {
+            steps {
+                bat "conda deactivate"
+                
+            }
+        }
+    }
+}
+
+
+pipeline {
+    agent any
+	environment {
+     PYTHONPATH = "%WORKSPACE%\\test_env\\Scripts"
+     }
+     stages {
+        stage('Build') {
+            steps {
+			withPythonEnv('C:\\Users\\santa_000\\.jenkins\\workspace\\Python_login\\test_env\\Scripts') {
+                echo 'We are cloning the repository'
+                bat "echo %WORKSPACE%"
+                bat "python -m venv test_env"
+                bat "pip install -r requirement.txt"
+                bat "python %WORKSPACE%\\basic.py"
+                
+            }
+			}
+        }
+    }
+}
+
+
+
+
+pipeline {
+    agent any
+    environment {
+     PYTHONPATH = "%WORKSPACE%\\test_env\\Scripts"
+     }
+     stages {
+        stage('Make Virtual Env') {
+            steps {
+                withPythonEnv('test_env') {
+                    bat 'pip install -r requirements.txt'
+                }
+            }
+        }
+          stage('Test') {
+            steps {
+                withPythonEnv('test_env') {
+                    bat 'python %WORKSPACE%\\basic.py'
+                    }
+                }
+            }
+          stage('Teardown') {
+            steps {
+			 withPythonEnv('test_env') {
+                bat "echo %WORKSPACE%"
+             } 
+            }
+        }
+    }
+}
+
+
+
+
+
+
